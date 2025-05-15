@@ -30,7 +30,7 @@
         <h2>Welcome to Attendence Dashboard</h2>
         <nav>
             <ul>
-                <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'mark']); ?>">Generate
+                <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'generate']); ?>">Generate
                         Payslips</a></li>
                 <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'add']); ?>">Add Bounses and Deductions
                        </a></li>

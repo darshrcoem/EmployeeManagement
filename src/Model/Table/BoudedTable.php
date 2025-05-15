@@ -36,8 +36,11 @@ class BoudedTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
+        
+
         $this->belongsTo('EmpData', [
             'foreignKey' => 'emp_id',
+             'className' => 'EmpData',
         ]);
     }
 

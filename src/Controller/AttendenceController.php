@@ -101,8 +101,8 @@ class AttendenceController extends AppController
     }
     public function report()
     {
-        $month = $this->request->getQuery('month.month');
-        $year = $this->request->getQuery('year.year');
+        $month = $this->request->getQuery('month.month')?:date('m');
+        $year = $this->request->getQuery('year.year')?:date('Y');
         $department = $this->request->getQuery('department');
         $departments = $this->EmpData->find()
             ->select(['department'])
@@ -111,11 +111,12 @@ class AttendenceController extends AppController
             ->extract('department')
             ->toArray();
 
-        $startDate= new Time(   $year . '-' . $month . '-01');
+        $startDate= new Time(   $year . '-' . $month . "-01");
         $startDateString= $startDate->format('Y-m-d');
         $endDateString = $startDate->endOfMonth()->format('Y-m-d');
 
 
+        
         // Query without duplicate rows
         $query = $this->EmpData->find()
             ->select(['EmpData.emp_id', 'EmpData.full_name', 'EmpData.department'])

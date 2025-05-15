@@ -25,21 +25,21 @@ class PayslipControllerTest extends TestCase
     ];
 
     /**
-     * Test index method
+     * Test initialize method
      *
      * @return void
      */
-    public function testIndex()
+    public function testInitialize()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
 
     /**
-     * Test view method
+     * Test display method
      *
      * @return void
      */
-    public function testView()
+    public function testDisplay()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
@@ -55,21 +55,21 @@ class PayslipControllerTest extends TestCase
     }
 
     /**
-     * Test edit method
+     * Test generate method
      *
      * @return void
      */
-    public function testEdit()
+    public function testGenerate()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
 
     /**
-     * Test delete method
+     * Test slip method
      *
      * @return void
      */
-    public function testDelete()
+    public function testSlip()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

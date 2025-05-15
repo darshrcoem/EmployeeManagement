@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * Payslip Model
  *
- * @property \App\Model\Table\EmpDataTable&\Cake\ORM\Association\BelongsTo $EmpData
+ * @property &\Cake\ORM\Association\BelongsTo $Emps
  *
  * @method \App\Model\Entity\Payslip get($primaryKey, $options = [])
  * @method \App\Model\Entity\Payslip newEntity($data = null, array $options = [])
@@ -32,9 +32,9 @@ class PayslipTable extends Table
     {
         parent::initialize($config);
 
-        $this->setTable('payslip');
-        $this->setDisplayField('payslip_id');
-        $this->setPrimaryKey('payslip_id');
+        $this->setTable('Payslip');
+        // $this->setDisplayField('id');
+        $this->setPrimaryKey('id');
 
         $this->belongsTo('EmpData', [
             'foreignKey' => 'emp_id',
@@ -48,47 +48,66 @@ class PayslipTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
-        $validator
-            ->integer('payslip_id')
-            ->allowEmptyString('payslip_id', null, 'create');
+    // public function validationDefault(Validator $validator)
+    // {
+        // $validator
+        //     ->integer('id')
+        //     ->allowEmptyString('id', null, 'create');
 
-        $validator
-            ->date('month')
-            ->requirePresence('month', 'create')
-            ->notEmptyDate('month');
+        // $validator
+        //     ->scalar('full_name')
+        //     ->maxLength('full_name', 255)
+        //     ->requirePresence('full_name', 'create')
+        //     ->notEmptyString('full_name');
 
-        $validator
-            ->integer('base_pay')
-            ->requirePresence('base_pay', 'create')
-            ->notEmptyString('base_pay');
+        // $validator
+        //     ->scalar('month')
+        //     ->maxLength('month', 20)
+        //     ->requirePresence('month', 'create')
+        //     ->notEmptyString('month');
 
-        $validator
-            ->integer('days_worked')
-            ->requirePresence('days_worked', 'create')
-            ->notEmptyString('days_worked');
+        // $validator
+        //     ->scalar('year')
+        //     ->maxLength('year', 20)
+        //     ->requirePresence('year', 'create')
+        //     ->notEmptyString('year');
 
-        $validator
-            ->integer('total_bonus')
-            ->allowEmptyString('total_bonus');
+        // $validator
+        //     ->decimal('base_pay')
+        //     ->requirePresence('base_pay', 'create')
+        //     ->notEmptyString('base_pay');
 
-        $validator
-            ->integer('total_deduction')
-            ->allowEmptyString('total_deduction');
+        // $validator
+        //     ->integer('days_worked')
+        //     ->requirePresence('days_worked', 'create')
+        //     ->notEmptyString('days_worked');
 
-        $validator
-            ->integer('net_pay')
-            ->requirePresence('net_pay', 'create')
-            ->notEmptyString('net_pay');
+        // $validator
+        //     ->decimal('total_bonus')
+        //     ->requirePresence('total_bonus', 'create')
+        //     ->notEmptyString('total_bonus');
 
-        $validator
-            ->date('payment_date')
-            ->requirePresence('payment_date', 'create')
-            ->notEmptyDate('payment_date');
+        // $validator
+        //     ->decimal('total_deduction')
+        //     ->requirePresence('total_deduction', 'create')
+        //     ->notEmptyString('total_deduction');
 
-        return $validator;
-    }
+        // $validator
+        //     ->decimal('net_pay')
+        //     ->requirePresence('net_pay', 'create')
+        //     ->notEmptyString('net_pay');
+
+        // $validator
+        //     ->date('payment_date')
+        //     ->requirePresence('payment_date', 'create')
+        //     ->notEmptyDate('payment_date');
+
+        // $validator
+        //     ->dateTime('created_at')
+        //     ->notEmptyDateTime('created_at');
+
+        // return $validator;
+    // }
 
     /**
      * Returns a rules checker object that will be used for validating

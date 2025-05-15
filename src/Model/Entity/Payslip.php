@@ -6,15 +6,18 @@ use Cake\ORM\Entity;
 /**
  * Payslip Entity
  *
- * @property int $payslip_id
+ * @property int $id
  * @property int $emp_id
- * @property \Cake\I18n\FrozenDate $month
- * @property int $base_pay
+ * @property string $full_name
+ * @property string $month
+ * @property string $year
+ * @property float $base_pay
  * @property int $days_worked
- * @property int|null $total_bonus
- * @property int|null $total_deduction
- * @property int $net_pay
+ * @property float $total_bonus
+ * @property float $total_deduction
+ * @property float $net_pay
  * @property \Cake\I18n\FrozenDate $payment_date
+ * @property \Cake\I18n\FrozenTime $created_at
  *
  * @property \App\Model\Entity\EmpData $emp_data
  */
@@ -31,13 +34,16 @@ class Payslip extends Entity
      */
     protected $_accessible = [
         'emp_id' => true,
+        'full_name' => true,
         'month' => true,
+        'year' => true,
         'base_pay' => true,
         'days_worked' => true,
         'total_bonus' => true,
         'total_deduction' => true,
         'net_pay' => true,
         'payment_date' => true,
+        'created_at' => true,
         'emp_data' => true,
     ];
 }
