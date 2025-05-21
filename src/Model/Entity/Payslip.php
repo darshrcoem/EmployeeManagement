@@ -18,6 +18,7 @@ use Cake\ORM\Entity;
  * @property float $net_pay
  * @property \Cake\I18n\FrozenDate $payment_date
  * @property \Cake\I18n\FrozenTime $created_at
+ * @property string|null $department
  *
  * @property \App\Model\Entity\EmpData $emp_data
  */
@@ -44,6 +45,8 @@ class Payslip extends Entity
         'net_pay' => true,
         'payment_date' => true,
         'created_at' => true,
+        'department' => true,
         'emp_data' => true,
+        
     ];
 }

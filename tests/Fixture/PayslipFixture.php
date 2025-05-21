@@ -13,7 +13,7 @@ class PayslipFixture extends TestFixture
      *
      * @var string
      */
-    public $table = 'payslip';
+    public $table = 'Payslip';
     /**
      * Fields
      *
@@ -33,6 +33,7 @@ class PayslipFixture extends TestFixture
         'net_pay' => ['type' => 'decimal', 'length' => 10, 'precision' => 2, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => ''],
         'payment_date' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
         'created_at' => ['type' => 'timestamp', 'length' => null, 'null' => false, 'default' => 'CURRENT_TIMESTAMP', 'comment' => '', 'precision' => null],
+        'department' => ['type' => 'string', 'length' => 200, 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
         ],
@@ -61,8 +62,9 @@ class PayslipFixture extends TestFixture
                 'total_bonus' => 1.5,
                 'total_deduction' => 1.5,
                 'net_pay' => 1.5,
-                'payment_date' => '2025-05-16',
-                'created_at' => 1747398330,
+                'payment_date' => '2025-05-21',
+                'created_at' => 1747808842,
+                'department' => 'Lorem ipsum dolor sit amet',
             ],
         ];
         parent::init();

@@ -32,7 +32,7 @@
 
         </table>
         <div class="bu">
-            <?= $this->Html->link(__('Dashboard'), ['controller' => 'EmpData', 'action' => 'display'], ['class' => 'button1']) ?>
+            <?= $this->Html->link(__('Dashboard'), ['controller' => 'Payslip', 'action' => 'display'], ['class' => 'button1']) ?>
         </div>
         <?= $this->Form->end() ?>
     </div>

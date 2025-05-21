@@ -49,54 +49,68 @@ class PayslipController extends AppController
     public function add()
     {
         $emp = $this->EmpData->find('all')->toArray();
+
         $this->set(compact('emp'));
 
         $this->render('add');
     }
-    public function generate()
+    public function generate1($id = null, $month = null, $year = null)
     {
-        $month = $this->request->getQuery('month.month') ?: date('m');
-        $year = $this->request->getQuery('year.year') ?: date('Y');
-        // $emp = $this->EmpData->find('all')->toArray();
-        $department = $this->request->getQuery('department');
-        $departments = $this->EmpData->find()
-            ->select(['department'])
-            ->distinct(['department'])
-            ->order(['department' => 'ASC'])
-            ->extract('department')
-            ->toArray();
+        if (!$id || !$month || !$year) {
+            $this->Flash->error('Employee ID, Month, and Year are required.');
+            return $this->redirect($this->referer());
+        }
 
-        $startDate = new Time($year . '-' . $month . "-01");
+        $startDate = new Time("$year-$month-01");
         $startDateString = $startDate->format('Y-m-d');
         $endDateString = $startDate->endOfMonth()->format('Y-m-d');
+
         $start = new DateTime($startDateString);
         $end = new DateTime($endDateString);
-        $end->modify('+1 day'); // Include the end date
+        $end->modify('+1 day');
 
         $interval = new DateInterval('P1D');
         $period = new DatePeriod($start, $interval, $end);
+
         $workingDaysCount = 0;
         foreach ($period as $date) {
-            if ($date->format('N') != 7) { // Sunday excluded
+            if ($date->format('N') != 7) { // Exclude Sundays
                 $workingDaysCount++;
             }
         }
 
-        // $workingDaysCount now holds total working days (Monday to Saturday)
+        if ($workingDaysCount === 0) {
+            $this->Flash->error('No working days found for the selected month.');
+            return;
+        }
+        $attendanceDates = $this->Attendence->find()
+            ->select(['at_date'])
+            ->where([
+                'Attendence.at_date >=' => $startDateString,
+                'Attendence.at_date <=' => $endDateString,
+                'Attendence.emp_id' => $id
+            ])
+            ->extract('at_date')
+            ->toArray();
 
 
+        if (sizeof($attendanceDates)!=$workingDaysCount) {
+            $this->Flash->error('Cannot generate payslip: Attendance not marked for all working days.');
+            return $this->redirect($this->referer());
+        }
+
+        // Fetch employee details
         $query = $this->EmpData->find()
             ->select([
-                'EmpData.emp_id',
-                'EmpData.salary',
-                'EmpData.role',
-                'EmpData.Full_name',
-                'EmpData.department',
-                'Bouded.record_date',
-                'Bouded.fest_bounse',
-                'Bouded.perf_bounse',
-                'Bouded.tax_ded',
-                'Bouded.unpaid_ded'
+                'emp_id',
+                'salary',
+                'role',
+                'Full_name',
+                'department',
+                'fest_bounse' => 'Bouded.fest_bounse',
+                'perf_bounse' => 'Bouded.perf_bounse',
+                'tax_ded' => 'Bouded.tax_ded',
+                'unpaid_ded' => 'Bouded.unpaid_ded'
             ])
             ->join([
                 'table' => 'bouded',
@@ -107,88 +121,145 @@ class PayslipController extends AppController
                     'Bouded.record_date' => $endDateString
                 ]
             ])
-            ->where(['EmpData.joining_date <=' => $endDateString]);
+            ->where([
+                'EmpData.emp_id' => $id,
+                'EmpData.joining_date <=' => $endDateString
+            ])
+            ->first();
 
-
-        if (!empty($department)) {
-            $query->where(['EmpData.department' => $department]);
-        }
-        $data = [];
-        $data = $query
-            ->order(['EmpData.emp_id' => 'ASC'])
-            ->toArray();
-        foreach ($query as $row) {
-            $indexedData[$row->emp_id] = $row;
+        if (!$query) {
+            $this->Flash->error("Employee data not found for ID: $id");
+            return;
         }
 
-        $attendanceQuery = $this->Attendence->find()
+        $emp = $query;
+
+        // Get attendance summary
+        $this->loadModel('Attendence');
+        $attendanceData = $this->Attendence->find()
             ->select([
-                'emp_id',
                 'status',
                 'total' => $this->Attendence->find()->func()->count('status')
             ])
             ->where([
                 'Attendence.at_date >=' => $startDateString,
                 'Attendence.at_date <=' => $endDateString,
-                'Attendence.emp_id IN' => collection($data)->extract('emp_id')->toList()
+                'Attendence.emp_id' => $id
             ])
-            ->group(['Attendence.emp_id', 'Attendence.status']);
+            ->group(['Attendence.status'])
+            ->toArray();
 
-        $attendanceResults = $attendanceQuery->toArray();
-        $this->loadModel('Payslip');
-        foreach ($attendanceResults as $att) {
-            $attendanceSummary[$att->emp_id][$att->status] = $att->total;
+        $attendanceSummary = [];
+        foreach ($attendanceData as $att) {
+            $attendanceSummary[$att->status] = $att->total;
         }
-        // foreach ($data as $emp) {
-        //     $empId = $emp->emp_id;
-        //     $salary = $emp->salary;
-        //     $daysWorked = isset($attendanceSummary[$empId]['Present']) ? $attendanceSummary[$empId]['Present'] : 0;
 
-        //     // Bonuses and Deductions
-        //     $festBonus = $emp->Bouded['fest_bounse'] ?? 0;
-        //     $perfBonus = $emp->Bouded['perf_bounse'] ?? 0;
-        //     $taxDed = $emp->Bouded['tax_ded'] ?? 0;
-        //     $unpaidDed = $emp->Bouded['unpaid_ded'] ?? 0;
+        $daysWorked = $attendanceSummary['Present'] ?? 0;
 
-        //     // Calculate net salary
-        //     $dailyPay = $salary / $workingDaysCount;
-        //     $basePay = round($dailyPay * $daysWorked);
-        //     $netSalary = $basePay + $festBonus + $perfBonus - $taxDed - $unpaidDed;
+        // Salary calculation
+        $festBonus = $emp->fest_bounse ?? 0;
+        $perfBonus = $emp->perf_bounse ?? 0;
+        $taxDed = $emp->tax_ded ?? 0;
+        $unpaidDed = $emp->unpaid_ded ?? 0;
 
-        //     $entity = [
-        //         'emp_id' => (int) $empId,
-        //         'month' => (string) $month,
-        //         'year' => (string) $year,
-        //         'full_name' => (string) $emp->Full_name,
-        //         'base_pay' => (float) $basePay,
-        //         'days_worked' => (int) $daysWorked,
-        //         'total_bonus' => (float) ($festBonus + $perfBonus),
-        //         'total_deduction' => (float) ($taxDed + $unpaidDed),
-        //         'net_pay' => (float) $netSalary,
-        //         'payment_date' => $endDateString // Make sure it's a valid date string or Date object
-        //     ];
-        //     $payslipEntity = $this->Payslip->newEntity($entity);
-        //     if (!$this->Payslip->save($payslipEntity)) {
-        //         // Optional: collect errors for debugging
-        //         $errors = $payslipEntity->getErrors();
-        //         // You can log or flash the error if needed
-        //         $this->Flash->error("Payslip not saved for employee ID $empId.");
-        //     }
+        $dailyPay = $emp->salary / $workingDaysCount;
+        $basePay = round($dailyPay * $daysWorked);
+        $netSalary = $basePay + $festBonus + $perfBonus - $taxDed - $unpaidDed;
 
-        // }
-        $this->set(compact('data', 'emp', 'bou', 'departments', 'month', 'year', 'department', 'attendanceSummary', 'workingDaysCount'));
+        // Save payslip
+        $this->loadModel('Payslip');
+        $payslipData = [
+            'emp_id' => (int) $id,
+            'month' => (string) $month,
+            'year' => (string) $year,
+            'full_name' => (string) $emp->Full_name,
+            'base_pay' => (float) $basePay,
+            'days_worked' => (int) $daysWorked,
+            'total_bonus' => (float) ($festBonus + $perfBonus),
+            'total_deduction' => (float) ($taxDed + $unpaidDed),
+            'net_pay' => (float) $netSalary,
+            'payment_date' => date('Y-m-d'),
+            'department' => (string) $emp->department
+        ];
+
+        $payslipEntity = $this->Payslip->newEntity($payslipData);
+        if ($this->Payslip->save($payslipEntity)) {
+            $this->Flash->success("Payslip successfully generated for employee ID $id.");
+            return $this->redirect(['action' => 'generate']);
+        } else {
+            $this->Flash->error("Payslip not saved for employee ID $id.");
+        }
+        $this->set(compact('emp', 'attendanceSummary', 'workingDaysCount', 'month', 'year'));
     }
-    public function slip($id = null)
+
+
+    public function generate()
+    {
+        $month = $this->request->getQuery('month.month') ?: date('m');
+        $year = $this->request->getQuery('year.year') ?: date('Y');
+        $department = $this->request->getQuery('department');
+
+        $departments = $this->EmpData->find()
+            ->select(['department'])
+            ->distinct(['department'])
+            ->order(['department' => 'ASC'])
+            ->extract('department')
+            ->toArray();
+        $generatedSlips = $this->Payslip->find('list', [
+            'keyField' => 'emp_id',
+            'valueField' => 'id'
+        ])->where([
+                    'month' => $month,
+                    'year' => $year
+                ])->toArray();
+        $query = $this->EmpData->find();
+
+        if (!empty($department)) {
+            $query->where(['department' => $department]);
+        }
+
+        $data = $query->order(['emp_id' => 'ASC'])->toArray();
+        $this->set(compact('data', 'month', 'year', 'department', 'generatedSlips', 'departments'));
+    }
+    public function view()
+    {
+        $month = $this->request->getQuery('month.month') ?: date('m');
+        $year = $this->request->getQuery('year.year') ?: date('Y');
+        $department = $this->request->getQuery('department');
+
+        $departments = $this->EmpData->find()
+            ->select(['department'])
+            ->distinct(['department'])
+            ->order(['department' => 'ASC'])
+            ->extract('department')
+            ->toArray();
+
+        $query = $this->Payslip->find()
+            ->where([
+                'month' => $month,
+                'year' => $year
+            ]);
+
+        if (!empty($department)) {
+            $query->where(['department' => $department]);
+        }
+
+        $payslips = $query->order(['emp_id' => 'ASC'])->toArray();
+        $this->set(compact('payslips', 'month', 'year', 'department', 'departments'));
+    }
+    public function slip($id = null, $month = null, $year = null)
     {
         $query = $this->Payslip->find()
-            ->where(['emp_id' => $id])
+            ->where([
+                'emp_id' => $id,
+                'month' => $month,
+                'year' => $year
+            ])
             ->first();
-        $data=$query->toArray();
+        $data = $query->toArray();
         $this->set(compact('data'));
         $this->render('slip');
     }
-
-
 
 
 }

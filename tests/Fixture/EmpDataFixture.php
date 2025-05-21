@@ -49,7 +49,7 @@ class EmpDataFixture extends TestFixture
                 'department' => 'Lorem ipsum dolor sit amet',
                 'role' => 'Lorem ipsum dolor sit amet',
                 'salary' => 1,
-                'joining_date' => '2025-05-07',
+                'joining_date' => '2025-05-21',
                 'email' => 'Lorem ipsum dolor sit amet',
                 'mobile' => 1,
                 'status' => 'Lorem ipsum dolor sit amet',

@@ -23,7 +23,7 @@ class BoudedController extends AppController
     }
 
     public function bouded($id = null)
-{
+  {
     $this->request->allowMethod(['get', 'post']);
     $emp = $this->EmpData->find()->where(['emp_id' => $id])->first();
     $this->set(compact('emp'));

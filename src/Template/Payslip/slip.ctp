@@ -123,4 +123,7 @@
   <div class="net-salary">
     Net Salary: ₹ <?= number_format($data['net_pay'], 2) ?>
   </div>
+  <div class="bu">
+            <?= $this->Html->link(__('Dashboard'), ['controller' => 'Payslip', 'action' => 'display'], ['class' => 'button1']) ?>
+        </div>
 </div>

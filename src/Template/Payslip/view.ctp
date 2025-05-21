@@ -2,7 +2,7 @@
 
 <div class="view-container">
     <?= $this->Form->create(null, ['type' => 'get']) ?>
-    <h2>Generate Payslips</h2>
+    <h2>View Payslips</h2>
     <div class="filters">
         <?= $this->Form->input('month', [
             'type' => 'month',
@@ -17,6 +17,7 @@
             'type' => 'year',
             'value' => $year,
             'empty' => 'Select year',
+            'options' => range(2025, date('Y') + 5),
             'id' => 'year',
             'label' => false,
             'class' => 'date-input',
@@ -33,32 +34,32 @@
         <?= $this->Form->button(__('View'), ['type' => 'submit', 'class' => 'button12']) ?>
         <table>
             <tr>
-                <th>Emp_id</th>
                 <th>Full Name</th>
                 <th>Department</th>
                 <th>Month</th>
                 <th>Year</th>
                 <th>Base Pay</th>
-                <th>Generate Slip</th>
+                <th>Total Bounses</th>
+                <th>Total Deductions</th>
+                <th>Net Salary</th>
+                <th>View Slip</th>
             </tr>
-            <?php foreach ($data as $res): ?>
+            <?php foreach ($payslips as $res): ?>
                 <tr>
-                    <td><?= h($res->emp_id)?></td>
-                    <td><?= h($res->Full_name) ?></td>
+                    <td><?= h($res->full_name)?></td>
                     <td><?= h($res->department) ?></td>
-                    <td><?= h($month) ?></td>
-                    <td><?= h($year) ?></td>
-                    <td><?= h($res->salary) ?></td>
+                    <td><?= h($res->month) ?></td>
+                    <td><?= h($res->year) ?></td>
+                    <td><?= h($res->base_pay) ?></td>
+                    <td><?= h($res->total_bonus) ?></td>
+                    <td><?= h($res->total_deduction) ?></td>
+                    <td><?= h($res->net_pay) ?></td>
                     <td>
-                        <?php if (isset($generatedSlips[$res->emp_id])): ?>
-                            <span class="already-generated">Already Generated</span>
-                        <?php else:?>
-                            <?= $this->Html->link(
-                                __('Generate slip'),
-                                ['action' => 'generate1', $res->emp_id, $month, $year],
-                                ['class' => 'linke']
-                            ) ?>
-                        <?php endif; ?>
+                        <?= $this->Html->link(
+                            __('View '),
+                            ['action' => 'slip', $res->emp_id, $res->month, $res->year],// Ensure this is the primary key
+                            ['class' => 'linke']
+                        ) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

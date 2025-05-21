@@ -28,6 +28,13 @@ class EmpData extends Entity
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
+        'Full_name' => true,
+        'department' => true,
+        'role' => true,
+        'salary' => true,
+        'joining_date' => true,
+        'email' => true,
+        'mobile' => true,
+        'status' => true,
     ];
 }

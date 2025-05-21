@@ -21,7 +21,7 @@
                     Management</a></li>
             <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'display',$username]); ?>">Payroll
                     management</a></li>
-            <li><a href="<?= $this->Url->build(['controller' => 'EmpData', 'action' => 'deleteemp',$username]); ?>">Additional
+            <li><a href="<?= $this->Url->build(['controller' => 'Report', 'action' => 'display',$username]); ?>">Additional
                     Reports</a></li>
         </ul>
     </div>
