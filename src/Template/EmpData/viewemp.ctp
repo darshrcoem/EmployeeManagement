@@ -1,7 +1,6 @@
 <!-- filepath: c:\Users\admin\Desktop\Project\my_app_name\src\Template\EmpData\viewemp.ctp -->
 
 <body>
-    <link rel="stylesheet" href="/css/home.css">
     <div class="view-container">
         <?= $this->Form->create(null, ['type' => 'get']) ?>
         <h2>View Employees</h2>
@@ -34,6 +33,8 @@
                     <th>Email</th>
                     <th>Mobile</th>
                     <th><?= $this->Paginator->sort('status', 'Status') ?></th>
+                    <th>Edit</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,6 +49,21 @@
                         <td><?= h($res->email) ?></td>
                         <td><?= h($res->mobile) ?></td>
                         <td><?= h($res->status) ?></td>
+                        <td>
+                            <?= $this->Html->link(
+                                '✏️',
+                                ['controller' => 'EmpData', 'action' => 'update', $res->emp_id],
+                                ['class' => 'linke', 'escape' => false] // escape false allows emoji rendering
+                            ) ?>
+                        </td>
+                        <td>
+                            <?= $this->Form->postLink(
+                                '🗑️',
+                                ['action' => 'delete', $res->emp_id],
+                                ['confirm' => 'Are you sure?', 'class' => 'linkd', 'escape' => false]
+                            ) ?>
+                        </td>
+
                     </tr>
                 <?php endforeach; ?>
             </tbody>

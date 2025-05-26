@@ -26,6 +26,7 @@ class AttendenceFixture extends TestFixture
         'at_date' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
         'status' => ['type' => 'string', 'length' => null, 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'remark' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'access' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['at_id'], 'length' => []],
             'emp_id' => ['type' => 'unique', 'columns' => ['emp_id', 'at_date'], 'length' => []],
@@ -48,9 +49,10 @@ class AttendenceFixture extends TestFixture
             [
                 'at_id' => 1,
                 'emp_id' => 1,
-                'at_date' => '2025-05-10',
+                'at_date' => '2025-05-22',
                 'status' => 'Lorem ipsum dolor sit amet',
                 'remark' => 'Lorem ipsum dolor sit amet',
+                'access' => 1,
             ],
         ];
         parent::init();

@@ -14,13 +14,11 @@ class ReportController extends AppController
         $this->loadModel('Payslip');
         $this->loadModel('Attendence');
     }
-
     public function display($username = null)
     {
         if (!$username) {
             $username = $this->request->getSession()->read('Auth.admin.username');
         }
-
         $this->set('username', $username);
         $this->render('display');
     }
@@ -34,9 +32,7 @@ class ReportController extends AppController
             ->order(['month' => 'ASC'])
             ->extract('month')
             ->toArray();
-
         $selectedMonth = $this->request->getQuery('selectedMonth');
-
         $report = [];
         if ($selectedMonth) {
             $report = $this->Payslip->find()
@@ -56,8 +52,6 @@ class ReportController extends AppController
         $this->set(compact('monthList', 'selectedMonth', 'report'));
         $this->render('dept');
     }
-
-    // 📆 YEARLY EMPLOYEE-WISE SALARY REPORT
     public function empyear()
     {
         $yearList = $this->Payslip->find()
@@ -92,7 +86,6 @@ class ReportController extends AppController
 
     public function empmonth()
     {
-        // Fetch unique months for filter dropdown
         $monthList = $this->Payslip->find()
             ->select(['month'])
             ->distinct(['month'])
@@ -101,7 +94,6 @@ class ReportController extends AppController
             ->toArray();
 
         $selectedMonth = $this->request->getQuery('selectedMonth');
-
         $data = [];
         if ($selectedMonth) {
             $data = $this->Payslip->find()
@@ -118,9 +110,8 @@ class ReportController extends AppController
                 ->order(['full_name' => 'ASC'])
                 ->toArray();
         }
-
         $this->set(compact('monthList', 'selectedMonth', 'data'));
-        $this->render('empmonth'); // Create employee_monthly.ctp
+        $this->render('empmonth');
     }
 
 }

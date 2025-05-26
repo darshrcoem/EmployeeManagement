@@ -1,5 +1,7 @@
+<head>  <?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')) ?></head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <body>
-    <link rel="stylesheet" href="/css/home.css">
     <div class="view-container">
         <h2>Mark Today's Attendance</h2>
         <table>
@@ -11,8 +13,13 @@
                 <th>Status</th>
                 <th>Mark & Remark</th>
             </tr>
-
             <?php foreach ($emp as $res): ?>
+                <?php
+                $isInactive = strtolower($res->status) === 'inactive';
+                $isMarked = isset($attendence[$res->emp_id]);
+                $disabled = $isInactive || $isMarked;
+                ?>
+
                 <tr>
                     <td><?= h($res->emp_id) ?></td>
                     <td><?= h($res->Full_name) ?></td>
@@ -20,46 +27,18 @@
                     <td><?= h($res->email) ?></td>
                     <td><?= h($res->status) ?></td>
                     <td>
-                        <?php
-                            $isInactive = strtolower($res->status) === 'inactive';
-                            $isMarked = isset($attendence[$res->emp_id]);
-                            $disabled = $isInactive || $isMarked;
-                        ?>
+                        <form class="attendance-form" data-emp-id="<?= h($res->emp_id) ?>">
+                            <?= $this->Form->control('_csrfToken', ['type' => 'hidden', 'value' => $this->request->getAttribute('csrfToken')]) ?>
 
-                        <?= $this->Form->create(null, ['url' => ['action' => 'mark']]) ?>
-                        <?= $this->Form->hidden('emp_id', ['value' => $res->emp_id]) ?>
-
-                        <div class="button-group">
-                            <?= $this->Form->button('✅ Present', [
-                                'name' => 'status',
-                                'value' => 'Present',
-                                'class' => 'button2',
-                                'disabled' => $disabled
-                            ]) ?>
-                            <?= $this->Form->button('❌ Absent', [
-                                'name' => 'status',
-                                'value' => 'Absent',
-                                'class' => 'button2',
-                                'disabled' => $disabled
-                            ]) ?>
-                            <?= $this->Form->button('🟡 On Leave', [
-                                'name' => 'status',
-                                'value' => 'Leave',
-                                'class' => 'button2',
-                                'disabled' => $disabled
-                            ]) ?>
-                        </div>
-
-                        <div class="remark-box">
-                            <?= $this->Form->textarea('remark', [
-                                'placeholder' => 'Enter remark',
-                                'rows' => 1,
-                                'cols' => 25,
-                                'disabled' => $disabled
-                            ]) ?>
-                        </div>
-
-                        <?= $this->Form->end() ?>
+                            <div class="button-group">
+                                <button type="button" class="button2 mark-btn" data-status="Present" <?= $disabled ? 'disabled' : '' ?>>✅ Present</button>
+                                <button type="button" class="button2 mark-btn" data-status="Absent" <?= $disabled ? 'disabled' : '' ?>>❌ Absent</button>
+                                <button type="button" class="button2 mark-btn" data-status="Leave" <?= $disabled ? 'disabled' : '' ?>>🟡 On Leave</button>
+                            </div>
+                            <div class="remark-box">
+                                <textarea class="remark" placeholder="Enter remark" rows="1" cols="25" <?= $disabled ? 'disabled' : '' ?>></textarea>
+                            </div>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -69,4 +48,44 @@
             <?= $this->Html->link(__('Dashboard'), ['controller' => 'Attendence', 'action' => 'display'], ['class' => 'button1']) ?>
         </div>
     </div>
+
+    <script>
+        $(".mark-btn").click(function (e) {
+            var csrfToken = $('meta[name="csrfToken"]').attr('content');
+            e.preventDefault();
+            const button = $(this);
+            const form = button.closest(".attendance-form");
+            const empId = form.data("emp-id");
+            const status = button.data("status");
+            const remark = form.find(".remark").val();
+            if (!empId || !status) {
+                alert("Employee ID and status are required.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "<?= $this->Url->build(['controller' => 'Attendence', 'action' => 'mark']) ?>",
+                data: {
+                    emp_id: empId,
+                    status: status,
+                    remark: remark
+                },
+                headers: {
+                    'X-CSRF-Token': '<?=h($this->request->getParam('_csrfToken')) ?>'
+                },
+    
+                success: function (response) {
+                    alert("Attendance marked as " + status);
+                    form.find(".mark-btn, .remark").attr("disabled", true);
+                },
+                error: function (xhr) {
+                    alert("Error while submitting attendance: " + xhr.status);
+                }
+            });
+        });
+
+    </script>
 </body>
+
+</html>

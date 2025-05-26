@@ -25,11 +25,31 @@ class AttendenceControllerTest extends TestCase
     ];
 
     /**
-     * Test index method
+     * Test initialize method
      *
      * @return void
      */
-    public function testIndex()
+    public function testInitialize()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test display method
+     *
+     * @return void
+     */
+    public function testDisplay()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test mark method
+     *
+     * @return void
+     */
+    public function testMark()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
@@ -45,11 +65,11 @@ class AttendenceControllerTest extends TestCase
     }
 
     /**
-     * Test add method
+     * Test report method
      *
      * @return void
      */
-    public function testAdd()
+    public function testReport()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
@@ -60,16 +80,6 @@ class AttendenceControllerTest extends TestCase
      * @return void
      */
     public function testEdit()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test delete method
-     *
-     * @return void
-     */
-    public function testDelete()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

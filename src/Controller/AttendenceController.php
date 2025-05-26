@@ -4,12 +4,10 @@ use App\Controller\AppController;
 use Cake\I18n\FrozenTime;
 use Cake\I18n\Time;
 use PhpParser\Node\Expr\FuncCall;
+use Cake\Http\Exception\MethodNotAllowedException;
 
 class AttendenceController extends AppController
 {
-   
-
-
     public function initialize(): void
     {
         parent::initialize();
@@ -27,58 +25,84 @@ class AttendenceController extends AppController
         $this->render('dashboard'); // Render 'dashboard.ctp'
     }
 
+
     public function mark()
     {
-        $emp = $this->EmpData->find('all')->toArray();
-        $this->set(compact('emp'));
-        $ate = $this->Attendence->find('all')->toArray();
-        $this->set(compact('ate'));
-        $today = FrozenTime::now()->format('Y-m-d');
-        // Controller: Convert attendances into key => value (emp_id => true)
-        $markedAttendance = [];
-
-        foreach ($ate as $a) {
-            if ($a->at_date->format('Y-m-d') === $today) {
-                $markedAttendance[$a->emp_id] = true;
-            }
-        }
-        if ($this->request->is('post')) {
-            $emp_id = $this->request->getData('emp_id');
+        if ($this->request->is('POST')) {
+            $empId = $this->request->getData('emp_id');
+            $date = $this->request->getData('date');
             $status = $this->request->getData('status');
             $remark = $this->request->getData('remark');
-            $result = $this->Attendence->newEntity([
-                'emp_id' => $emp_id,
-                'status' => $status,
-                'at_date' => $today,
-                'remark' => $remark,
-            ]);
-            if ($result) {
-                $this->Attendence->save($result);
-                $this->Flash->success(__('Attendance marked successfully.' . $status));
-            } else {
-                $this->Flash->error(__('Failed to mark attendance.'));
+
+            if (!$empId || !$date || !$status) {
+                return $this->response->withType('application/json')
+                    ->withStringBody(json_encode(['success' => false, 'message' => 'Missing required fields.']));
             }
-            return $this->redirect(['action' => 'mark']);
+            $existing = $this->Attendence->find()
+                ->where(['emp_id' => $empId, 'at_date' => $date])
+                ->first();
+
+            if ($existing) {
+                if ($existing->access == "0") {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Payslip generated, attendance cannot be edited.']));
+                }
+
+                $existing->status = $status;
+                $existing->remark = $remark;
+                $existing->modified = date('Y-m-d H:i:s');
+
+                if ($this->Attendence->save($existing)) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => true, 'message' => 'Attendance updated successfully.']));
+                } else {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Failed to update attendance.']));
+                }
+            } else {
+                $newAttendance = $this->Attendence->newEntity([
+                    'emp_id' => $empId,
+                    'at_date' => $date,
+                    'status' => $status,
+                    'remark' => $remark,
+                    'created' => date('Y-m-d H:i:s'),
+                    'modified' => date('Y-m-d H:i:s'),
+                    'access' => "1"
+                ]);
+
+                if ($this->Attendence->save($newAttendance)) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => true, 'message' => 'Attendance marked successfully.']));
+                } else {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Failed to mark attendance.']));
+                }
+            }
         }
-        $this->set('attendence', $markedAttendance);
     }
+
     public function view()
     {
         $emp = $this->EmpData->find('all')->toArray();
-        $ate = $this->Attendence->find('all')->toArray();
 
         $date = $this->request->getQuery('date');
 
         if (is_array($date)) {
             $date = $date['year'] . '-' . str_pad($date['month'], 2, '0', STR_PAD_LEFT) . '-' . str_pad($date['day'], 2, '0', STR_PAD_LEFT);
         }
+        if($date> date('Y-m-d')) {
+            $this->Flash->error(__('You cannot mark attendance for a future date.'));
+            return $this->redirect(['action' => 'view']);
+        }
+        
 
         $query = $this->EmpData->find()
             ->select([
                 'EmpData.emp_id',
                 'EmpData.full_name',
                 'Attendence.at_date',
-                'Attendence.status'
+                'Attendence.status',
+                'Attendence.access'
             ])
             ->join([
                 [
@@ -92,17 +116,16 @@ class AttendenceController extends AppController
                 'EmpData.joining_date <=' => $date,
                 'Attendence.at_date' => $date
             ])
-            ->order(['EmpData.full_name' => 'ASC']);
+            ->order(['EmpData.emp_id' => 'ASC']);
 
         $data = $query->toArray();
-
         $this->set(compact('emp', 'data', 'ate'));
 
     }
     public function report()
     {
-        $month = $this->request->getQuery('month.month')?:date('m');
-        $year = $this->request->getQuery('year.year')?:date('Y');
+        $month = $this->request->getQuery('month.month') ?: date('m');
+        $year = $this->request->getQuery('year.year') ?: date('Y');
         $department = $this->request->getQuery('department');
         $departments = $this->EmpData->find()
             ->select(['department'])
@@ -111,13 +134,9 @@ class AttendenceController extends AppController
             ->extract('department')
             ->toArray();
 
-        $startDate= new Time(   $year . '-' . $month . "-01");
-        $startDateString= $startDate->format('Y-m-d');
+        $startDate = new Time($year . '-' . $month . "-01");
+        $startDateString = $startDate->format('Y-m-d');
         $endDateString = $startDate->endOfMonth()->format('Y-m-d');
-
-
-        
-        // Query without duplicate rows
         $query = $this->EmpData->find()
             ->select(['EmpData.emp_id', 'EmpData.full_name', 'EmpData.department'])
             ->contain([
@@ -135,8 +154,6 @@ class AttendenceController extends AppController
         $data = $query
             ->order(['EmpData.full_name' => 'ASC'])
             ->toArray();
-
-        // Attendance summary
         $attendanceSummary = [];
         foreach ($data as $d) {
             $empId = $d->emp_id;
@@ -150,7 +167,6 @@ class AttendenceController extends AppController
                 'leave' => 0,
                 'days' => []
             ];
-
             foreach ($d->attendence as $att) {
                 $status = strtolower($att->status);
                 $date = $att->at_date->format('Y-m-d');
@@ -161,16 +177,9 @@ class AttendenceController extends AppController
                 }
             }
         }
-
-        // Sort descending by emp_id
         krsort($attendanceSummary);
-
-        // Set to view
-        $this->set(compact('attendanceSummary', 'month', 'year', 'startDateString', 'endDateString', 'data','departments', 'department'));
+        $this->set(compact('attendanceSummary', 'month', 'year', 'startDateString', 'endDateString', 'data', 'departments', 'department'));
     }
-
-
-
     public function edit()
     {
         if ($this->request->is('post')) {

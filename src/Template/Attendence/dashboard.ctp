@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendence Dashboard</title>
-    <link rel="stylesheet" href="/css/home.css">
-</head>
-
 <body>
     <div class="toolbar">
         <div class="admin-name">Admin: <?=  $username?></div>
@@ -29,9 +20,7 @@
         <h2>Welcome to Attendence Dashboard</h2>
         <nav>
             <ul>
-                <li><a href="<?= $this->Url->build(['controller' => 'Attendence', 'action' => 'mark']); ?>">Mark
-                        Attendence</a></li>
-                <li><a href="<?= $this->Url->build(['controller' => 'Attendence', 'action' => 'view']); ?>">View
+                <li><a href="<?= $this->Url->build(['controller' => 'Attendence', 'action' => 'view']); ?>">Mark
                         Attendence</a></li>
                 <li><a href="<?= $this->Url->build(['controller' => 'Attendence', 'action' => 'report']); ?>">Attendence
                         Report</a></li>
@@ -44,8 +33,6 @@
         function toggleDropdown() {
             const dropdown = document.getElementById("dropdownMenu");
             const button = document.querySelector(".menu-button");
-
-            // Toggle dropdown visibility
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
             } else {
@@ -68,5 +55,3 @@
         });
     </script>
 </body>
-
-</html>

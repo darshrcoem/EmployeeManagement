@@ -12,7 +12,6 @@
             'label' => false,
             'class' => 'date-input',
         ]) ?>
-
         <?= $this->Form->input('year', [
             'type' => 'year',
             'value' => $year,
@@ -43,7 +42,7 @@
             </tr>
             <?php foreach ($data as $res): ?>
                 <tr>
-                    <td><?= h($res->emp_id)?></td>
+                    <td><?= h($res->emp_id) ?></td>
                     <td><?= h($res->Full_name) ?></td>
                     <td><?= h($res->department) ?></td>
                     <td><?= h($month) ?></td>
@@ -51,12 +50,16 @@
                     <td><?= h($res->salary) ?></td>
                     <td>
                         <?php if (isset($generatedSlips[$res->emp_id])): ?>
-                            <span class="already-generated">Already Generated</span>
-                        <?php else:?>
                             <?= $this->Html->link(
-                                __('Generate slip'),
-                                ['action' => 'generate1', $res->emp_id, $month, $year],
-                                ['class' => 'linke']
+                                '<i class="fas fa-file-alt"></i>', // View icon
+                                ['action' => 'slip', $res->emp_id, $month, $year],
+                                ['class' => 'linkd', 'escape' => false]
+                            ) ?>
+                        <?php else: ?>
+                            <?= $this->Html->link(
+                                '<i class="fas fa-file-invoice-dollar"></i>', // Generate slip icon
+                                ['action' => 'payslipformat', $res->emp_id, $month, $year],
+                                ['class' => 'linke', 'escape' => false]
                             ) ?>
                         <?php endif; ?>
                     </td>
@@ -68,4 +71,6 @@
         <?= $this->Html->link(__('Dashboard'), ['controller' => 'Payslip', 'action' => 'display'], ['class' => 'button1']) ?>
     </div>
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </body>

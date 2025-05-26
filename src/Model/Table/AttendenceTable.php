@@ -38,6 +38,7 @@ class AttendenceTable extends Table
 
         $this->belongsTo('EmpData', [
             'foreignKey' => 'emp_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -67,6 +68,10 @@ class AttendenceTable extends Table
             ->scalar('remark')
             ->maxLength('remark', 255)
             ->allowEmptyString('remark');
+
+        $validator
+            ->boolean('access')
+            ->allowEmptyString('access');
 
         return $validator;
     }

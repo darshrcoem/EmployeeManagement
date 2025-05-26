@@ -17,9 +17,10 @@ class AdminController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
+    
     public function display()
     {
-        $this->render('home'); // Explicitly render the 'home.ctp' view
+        $this->render('index'); // Explicitly render the 'home.ctp' view
     }
     public function logout()
     {

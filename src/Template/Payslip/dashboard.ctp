@@ -32,10 +32,10 @@
             <ul>
                 <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'generate']); ?>">Generate
                         Payslips</a></li>
-                <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'add']); ?>">Add Bounses and Deductions
+                <!-- <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'add']); ?>">Add Bounses and Deductions
                        </a></li>
-                <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'view']); ?>">View Payslips
-                    </a></li>
+                 <li><a href="<?= $this->Url->build(['controller' => 'Payslip', 'action' => 'view']); ?>">View Payslips
+                    </a></li> --> 
             </ul>
         </nav>
         <a href="/logout" class="logout-link">Logout</a>

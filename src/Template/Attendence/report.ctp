@@ -1,5 +1,4 @@
 <body>
-    <link rel="stylesheet" href="/css/home.css">
 
     <div class="view-container">
         <?= $this->Form->create(null, ['type' => 'get']) ?>

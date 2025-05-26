@@ -5,72 +5,78 @@ use Twig\Template;
 <body>
     <div class="admin-form-container">
 
-        <?= $this->Form->create($emp) ?> <!-- Bound to the entity $emp -->
-        <h2>Edit Employee</h2>
-        <!-- Hidden input for emp_id -->
+        <?= $this->Form->create($emp) ?> 
+        <h2 class="form-title">Edit Employee</h2>
+
         <?= $this->Form->control('emp_id', ['type' => 'hidden']) ?>
 
-        <!-- Full Name -->
         <?= $this->Form->control('Full_name', [
             'label' => 'Full Name',
             'class' => 'form-control',
-            'readonly' => true
+            'readonly' => true,
         ]) ?>
 
-        <!-- Department -->
         <?= $this->Form->control('department', [
             'label' => 'Department',
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'required' => true
         ]) ?>
 
-        <!-- Role -->
         <?= $this->Form->control('role', [
             'label' => 'Role',
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'required' => true
         ]) ?>
 
-        <!-- Salary -->
         <?= $this->Form->control('salary', [
-            'type' => 'number', // Specify the input type for clarity
+            'type' => 'number',
             'label' => 'Salary',
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'required' => true,
+            'min' => 0
         ]) ?>
-
-        <!-- Joining Date -->
         <?= $this->Form->control('joining_date', [
             'label' => 'Joining Date',
             'type' => 'date',
             'class' => 'form-control',
+            'required' => true
         ]) ?>
 
-        <!-- Email -->
+
         <?= $this->Form->control('email', [
             'label' => 'Email',
-            'class' => 'form-control'
+            'type' => 'email',
+            'class' => 'form-control',
+            'required' => true
         ]) ?>
 
-        <!-- Mobile -->
+
         <?= $this->Form->control('mobile', [
             'label' => 'Mobile',
             'class' => 'form-control',
-            'value' => $emp->mobile // Fix: previously used $emp->phone
+            'pattern' => '[6-9]{1}[0-9]{9}',
+            'title' => 'Enter a valid 10-digit mobile number starting with 6-9',
+            'required' => true,
+            'value' => $emp->mobile
         ]) ?>
 
-        <!-- Status -->
+
         <?= $this->Form->control('status', [
             'label' => 'Status',
             'type' => 'select',
             'options' => ['Active' => 'Active', 'Inactive' => 'Inactive'],
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'required' => true
         ]) ?>
 
-        <!-- Submit Button -->
         <?= $this->Form->button(__('Submit'), ['class' => 'button']) ?>
-
-        <!-- End of Form -->
         <?= $this->Form->end() ?>
 
     </div>
 
-    <link rel="stylesheet" href="/css/home.css">
+    <style>
+        .form-title {
+            text-align: center;
+        }
+    </style>
 </body>

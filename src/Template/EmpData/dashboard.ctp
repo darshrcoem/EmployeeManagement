@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/css/home.css">
-</head>
-
-<body>
     <div class="toolbar">
         <div class="admin-name">Admin: <?= $username ?></div>
         <button class="menu-button" onclick="toggleDropdown()">☰ Menu</button>
@@ -34,10 +24,10 @@
                         Employee</a></li>
                 <li><a href="<?= $this->Url->build(['controller' => 'EmpData', 'action' => 'viewemp']); ?>">View
                         Employees</a></li>
-                <li><a href="<?= $this->Url->build(['controller' => 'EmpData', 'action' => 'editemp']); ?>">Edit
+                <!-- <li><a href="<?= $this->Url->build(['controller' => 'EmpData', 'action' => 'editemp']); ?>">Edit
                         Employee</a></li>
                 <li><a href="<?= $this->Url->build(['controller' => 'EmpData', 'action' => 'deleteemp']); ?>">Delete
-                        Employee</a></li>
+                        Employee</a></li> -->
             </ul>
         </nav>
         <a href="/logout" class="logout-link">Logout</a>
@@ -70,5 +60,3 @@
             }
         });
     </script>
-</body>
-</html>

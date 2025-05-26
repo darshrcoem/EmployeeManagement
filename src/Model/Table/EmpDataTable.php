@@ -5,7 +5,6 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-
 /**
  * EmpData Model
  *
@@ -43,11 +42,7 @@ class EmpDataTable extends Table
             'className' => 'Payslip',  
             'dependent' => true,
         ]);
-         $this->hasMany('bouded', [
-            'foreignKey' => 'emp_id', 
-            'className' => 'Bouded',  
-            'dependent' => true,
-        ]);
+         
     }
 
     /**

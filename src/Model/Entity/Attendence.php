@@ -11,6 +11,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenDate $at_date
  * @property string $status
  * @property string|null $remark
+ * @property bool|null $access
  *
  * @property \App\Model\Entity\EmpData $emp_data
  */
@@ -30,6 +31,7 @@ class Attendence extends Entity
         'at_date' => true,
         'status' => true,
         'remark' => true,
+        'access' => true,
         'emp_data' => true,
     ];
 }
