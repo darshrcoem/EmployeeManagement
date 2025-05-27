@@ -25,6 +25,25 @@
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: #ffffff;
 }
+.total-row {
+    font-weight: bold;
+    background-color: #f0f8ff; /* Light blue background */
+    color: #333;
+    text-align: right;
+}
+
+.total-row td {
+    border-top: 2px solid #000;
+    padding: 8px;
+}
+
+.flash-error {
+  color: #fff;
+  background: #e74c3c;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
 
 .admin-form-container .form-control:focus {
     border-color: #42a5f5;

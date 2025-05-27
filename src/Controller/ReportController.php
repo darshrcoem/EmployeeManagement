@@ -48,8 +48,15 @@ class ReportController extends AppController
                 ->order(['department' => 'ASC'])
                 ->toArray();
         }
+        $sum=[];
+        foreach ($report as $repo){
+            $sum['total_base_pay'] = ($sum['total_base_pay'] ?? 0) + $repo->total_base_pay;
+            $sum['total_bonus'] = ($sum['total_bonus'] ?? 0) + $repo->total_bonus;
+            $sum['total_deduction'] = ($sum['total_deduction'] ?? 0) + $repo->total_deduction;
+            $sum['total_net_salary'] = ($sum['total_net_salary'] ?? 0) + $repo->total_net_salary;
+        }
 
-        $this->set(compact('monthList', 'selectedMonth', 'report'));
+        $this->set(compact('monthList', 'selectedMonth', 'report', 'sum'));
         $this->render('dept');
     }
     public function empyear()
@@ -79,9 +86,16 @@ class ReportController extends AppController
                 ->order(['full_name' => 'ASC'])
                 ->toArray();
         }
-
-        $this->set(compact('yearList', 'year', 'data'));
+        $sum=[];
+        foreach ($data as $res) {
+            $sum['total_base_pay'] = ($sum['total_base_pay'] ?? 0) + $res->total_base_pay;
+            $sum['total_bonus12'] = ($sum['total_bonus12'] ?? 0) + $res->total_bonus12;
+            $sum['total_deduction12'] = ($sum['total_deduction12'] ?? 0) + $res->total_deduction12;
+            $sum['total_net_salary'] = ($sum['total_net_salary'] ?? 0) + $res->total_net_salary;
+        }
+        $this->set(compact('yearList', 'year', 'data', 'sum'));
         $this->render('empyear');
+
     }
 
     public function empmonth()
@@ -110,8 +124,16 @@ class ReportController extends AppController
                 ->order(['full_name' => 'ASC'])
                 ->toArray();
         }
-        $this->set(compact('monthList', 'selectedMonth', 'data'));
-        $this->render('empmonth');
+        $sum=[];
+        foreach ($data as $res) {
+            $sum['total_base_pay'] = ($sum['total_base_pay'] ?? 0) + $res->base_pay;
+            $sum['total_bonus'] = ($sum['total_bonus'] ?? 0) + $res->total_bonus;
+            $sum['total_deduction'] = ($sum['total_deduction'] ?? 0) + $res->total_deduction;
+            $sum['total_net_salary'] = ($sum['total_net_salary'] ?? 0) + $res->net_pay;
+        }
+        $this->set(compact('monthList', 'selectedMonth', 'data', 'sum'));
+        $html=$this->render('empmonth');
+        
     }
 
 }

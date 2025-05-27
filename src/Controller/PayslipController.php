@@ -56,7 +56,7 @@ class PayslipController extends AppController
         $start = new DateTime($startString);
         $end = (new DateTime($endString))->modify('+1 day');
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);
-
+        
         $workingDaysCount = 0;
         foreach ($period as $date) {
             if ($date->format('N') != 7) {
@@ -167,7 +167,11 @@ class PayslipController extends AppController
         $month = $this->request->getQuery('month.month') ?: date('m');
         $year = $this->request->getQuery('year.year') ?: date('Y');
         $department = $this->request->getQuery('department');
-
+        $startDate = new Time("$year-$month-01");
+        if($startDate->isFuture()) {
+            $this->Flash->error('Cannot generate payslip for a future month.');
+            return $this->redirect($this->referer());
+        }
         $departments = $this->EmpData->find()
             ->select(['department'])
             ->distinct(['department'])
